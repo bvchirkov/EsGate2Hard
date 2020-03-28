@@ -96,6 +96,9 @@ int main(/*int argc, char** argv*/)
     return 0;
 }
 
+/**
+ * @brief work_loop демо-режим
+ */
 unsigned int work_loop(void)
 {
     int res = openPort("/dev/ttyUSB0", B9600);
@@ -118,7 +121,6 @@ unsigned int work_loop(void)
     PKG _lht_stop  = {addr: 0, cmd: SET, data: CMD_STOP, str: "CMD_STOP"};
     PKG _off       = {addr: 0, cmd: SET, data: CMD_OFF, str: "CMD_OFF"};
 
-        
     while(mainloop)
     {
         printf("* Опрос ручных пожарных извещателей:\n");
@@ -224,6 +226,9 @@ void read_btn_status(struct Btn* aBtn)
     print_pkg(&_status, str);
 }
 
+/**
+ * @brief arw_test_on_off режим тестирования стрелок
+ */
 unsigned int arw_test_on_off()
 {
     int res = openPort("/dev/ttyUSB0", B9600);
@@ -359,6 +364,9 @@ unsigned int arw_test_on_off()
     return 1;
 }
 
+/**
+ * @brief lht_test_on_off режим тестирования светофоров
+ */
 unsigned int lht_test_on_off()
 {
     int res = openPort("/dev/ttyUSB0", B9600);
@@ -525,6 +533,9 @@ unsigned int push_pkg(PKG *aPkg)
     return 1;
 }
 
+/**
+ * @brief userCmds режим взаимодействия с каждым устройством индивидуально
+ */
 unsigned int userCmds()
 {
     int res = openPort("/dev/ttyUSB0", B9600);
@@ -561,9 +572,6 @@ unsigned int userCmds()
         scanf("%d", &interval);
     }
     
-    //pkg = {0x01, STATUS, CMD_OFF, "STATUS"};
-    //pkg = {0x01, SET, CMD_OFF, "SET, CMD_OFF"};
-    
     for (size_t r = 0; r < count; r++)
     {
         sendData(&pkg.addr, 1);
@@ -581,10 +589,10 @@ unsigned int userCmds()
             ssize_t s = readData(&rbuff[i], 1);
             if (s < 1)
             {
-            printf("Нет ответа\n");
-            //return 0;
-            i = 10;
-            break;
+				printf("Нет ответа\n");
+				//return 0;
+				i = 10;
+				break;
             }
             i++;
         }
@@ -601,16 +609,31 @@ unsigned int userCmds()
     return 1;
 }
 
+/**
+ * @brief _check_00 проверка на равенство двух бладших бит маске 00
+ * @param aData байт данных, в котором требуется проверить два младших бита
+ * @return 1 - два младших бита в aData равны 00, иначе - 0
+ */
 unsigned char _check_00(unsigned char aData)
 {
     return (((aData&(1<<0)) == 0) && ((aData&(1<<1)) == 0));
 }
 
+/**
+ * @brief _check_01 проверка на равенство двух бладших бит маске 01
+ * @param aData байт данных, в котором требуется проверить два младших бита
+ * @return 1 - два младших бита в aData равны 01, иначе - 0
+ */
 unsigned char _check_01(unsigned char aData)
 {
     return (((aData&(1<<0)) != 0) && ((aData&(1<<1)) == 0));
 }
 
+/**
+ * @brief _check_10 проверка на равенство двух бладших бит маске 10
+ * @param aData байт данных, в котором требуется проверить два младших бита
+ * @return 1 - два младших бита в aData равны 10, иначе - 0
+ */
 unsigned char _check_10(unsigned char aData)
 {
     return (((aData&(1<<0)) == 0) && ((aData&(1<<1)) != 0));
