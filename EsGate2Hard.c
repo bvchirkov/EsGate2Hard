@@ -131,8 +131,8 @@ unsigned int work_loop(void)
             printf("\t#%u ............. %u", btn_s[i].addr, btn_s[i].state);
             if (btn_s[i].state == 1) 
             {
-            flag_on_fire = 1;
-            printf(" *\n");
+				flag_on_fire = 1;
+				printf(" *\n");
             }
             else printf("\n");
         }
@@ -258,8 +258,8 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "ЛЕВО";
-            else if (_check_10(_status.data)) str = "ПРАВО";
+				if (_check_01(_status.data)) str = "ЛЕВО";
+				else if (_check_10(_status.data)) str = "ПРАВО";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -288,9 +288,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "ЛЕВО";
-            else if (_check_10(_status.data)) str = "ПРАВО";
-            else str = "ПРОВАЛ";
+				if (_check_01(_status.data)) str = "ЛЕВО";
+				else if (_check_10(_status.data)) str = "ПРАВО";
+				else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -319,9 +319,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "ЛЕВО";
-            else if (_check_10(_status.data)) str = "ПРАВО";
-            else str = "ПРОВАЛ";
+				if (_check_01(_status.data)) str = "ЛЕВО";
+				else if (_check_10(_status.data)) str = "ПРАВО";
+				else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -350,9 +350,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "ЛЕВО";
-            else if (_check_10(_status.data)) str = "ПРАВО";
-            else str = "ПРОВАЛ";
+				if (_check_01(_status.data)) str = "ЛЕВО";
+				else if (_check_10(_status.data)) str = "ПРАВО";
+				else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -396,8 +396,8 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "СТОП";
-            else if (_check_10(_status.data)) str = "ИДТИ";
+				if (_check_01(_status.data)) str = "СТОП";
+				else if (_check_10(_status.data)) str = "ИДТИ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -426,9 +426,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "СТОП";
-            else if (_check_10(_status.data)) str = "ИДТИ";
-            else str = "ПРОВАЛ";
+				if (_check_01(_status.data)) str = "СТОП";
+				else if (_check_10(_status.data)) str = "ИДТИ";
+				else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -457,9 +457,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "СТОП";
-            else if (_check_10(_status.data)) str = "ИДТИ";
-            else str = "ПРОВАЛ";
+				if (_check_01(_status.data)) str = "СТОП";
+				else if (_check_10(_status.data)) str = "ИДТИ";
+				else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -488,9 +488,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-            if (_check_01(_status.data)) str = "СТОП";
-            else if (_check_10(_status.data)) str = "ИДТИ";
-            else str = "ПРОВАЛ";
+				if (_check_01(_status.data)) str = "СТОП";
+				else if (_check_10(_status.data)) str = "ИДТИ";
+				else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
