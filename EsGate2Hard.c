@@ -28,7 +28,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "EsDelay.h"        ///< Интсрумент приостановки выполнения программы
 
 #define STATUS		( 0x00 ) ///< Команда запроса статуса устройства
-#define SET		    ( 0x01 ) ///< Команда установки состояния устройства
+#define SET		( 0x01 ) ///< Команда установки состояния устройства
 
 #define IDLE		( 0x00 ) ///< Заглуша, используется совместно с командой STATUS
 #define CMD_OFF		( 0x00 ) ///< Сброс состояния устройства
