@@ -25,22 +25,13 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #pragma once
 
 #include <time.h>
+#include <errno.h>
 
 /**
  * @brief _delay_ms задержка выполнения программы
- * @param msecs количество мс, на которые будет выполняться задержка
+ * @param msec количество мс, на которые будет выполняться задержка
  */
-void _delay_ms (unsigned int msecs)
-{
-	//конвертировать msecs в счетчик часов
-    clock_t goal = msecs * CLOCKS_PER_SEC / 1000 + clock();
-    //цикл, пока не закончиться goal
-    while ( goal > clock() );               		 		 
-}
-
-#include <errno.h>    
-
-int msleep(long msec)
+int _delay_ms(long msec)
 {
     struct timespec ts;
     int res;

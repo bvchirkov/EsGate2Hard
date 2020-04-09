@@ -22,7 +22,7 @@
 ########################################################################
 
 CC=gcc-8
-CFLAGS= -c -Wall -std=c11
+CFLAGS= -c -Wall -std=gnu11
 
 .PHONY: all clean
 all: clean EsGate2Hard

@@ -26,9 +26,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "EsCOMTools.h"     ///< Инструменты работы с COM портом Linux
 #include "EsPrintBits.h"    ///< Инструмент побитового вывода значения
 #include "EsDelay.h"        ///< Интсрумент приостановки выполнения программы
+#include <time.h>   	    ///< Для nanosleep
 
 #define STATUS		( 0x00 ) ///< Команда запроса статуса устройства
-#define SET			( 0x01 ) ///< Команда установки состояния устройства
+#define SET		( 0x01 ) ///< Команда установки состояния устройства
 
 #define IDLE		( 0x00 ) ///< Заглуша, используется совместно с командой STATUS
 #define CMD_OFF		( 0x00 ) ///< Сброс состояния устройства
@@ -71,7 +72,6 @@ struct Btn
 };
 
 void read_btn_status(struct Btn*);
-void _sleep_s(unsigned int);
 
 unsigned int push_pkg(PKG *);
 unsigned int arw_test_on_off(void);
@@ -97,26 +97,18 @@ int main(/*int argc, char** argv*/)
     //~ userCmds();
     
     // ======= AUTOTESTS ========
-    while (1)
-    {
-		lht_test_on_off();
-		arw_test_on_off();
-		btn_test_status();
-		_sleep_s(5);
-	}
+    //while (1)
+    //{
+	//lht_test_on_off();
+	//arw_test_on_off();
+	//btn_test_status();
+	//_sleep_s(5);
+    //}
     
     // ======= WORK EVERYDAY ========
     //~ work_loop();
-   
+       
     return 0;
-}
-
-void _sleep_s(unsigned int aSeconds)
-{
-	for (size_t i = 0; i < aSeconds; i++)
-	{
-		_delay_ms(1000);
-	}
 }
 
 /**
@@ -136,7 +128,7 @@ unsigned int work_loop(void)
     struct Btn btn_s[NUM_OF_BTN] = {
 			    {addr:btns[0], state:0, room:0}, 
 			    {addr:btns[1], state:0, room:1},
-			    //~ {addr:btns[2], state:0, room:2}
+			    {addr:btns[2], state:0, room:2}
 			  };
 
     while(mainloop)
@@ -149,8 +141,8 @@ unsigned int work_loop(void)
             printf("\t#%u ............. %u", btn_s[i].addr, btn_s[i].state);
             if (btn_s[i].state == 1) 
             {
-				flag_on_fire = 1;
-				printf(" *\n");
+		flag_on_fire = 1;
+		printf(" *\n");
             }
             else printf("\n");
         }
@@ -191,7 +183,8 @@ unsigned int work_loop(void)
                 _lht_stop.addr = lhts[2]; push_pkg(&_lht_stop);
                 btn_s[2].state = 0;
             }
-            _sleep_s(20);
+
+	    _delay_ms(20*1000);
 
             _off.addr = BROADCAST_ADDR; push_pkg(&_off);
             flag_on_fire = 0;
@@ -231,15 +224,15 @@ void print_pkg(PKG* aPkg, char* aStr)
  */
 void read_btn_status(struct Btn* aBtn)
 {
-    PKG _status = {addr: aBtn->addr, cmd: STATUS, data: IDLE, str: "STATUS"};
     printf("\t- Проверка статуса\n");
+    _status.addr = aBtn->addr;
     print_pkg(&_status, _status.str);
     push_pkg(&_status);
     
     char * str = "ТРЕВОГА";
     if ((_status.data & (1 << 4)) != 0) 
     {
-	    aBtn->state = 1;
+	aBtn->state = 1;
     } else str = "ВЫКЛ";
     print_pkg(&_status, str);
 }
@@ -271,8 +264,8 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "ЛЕВО";
-				else if (_check_10(_status.data)) str = "ПРАВО";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -301,9 +294,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "ЛЕВО";
-				else if (_check_10(_status.data)) str = "ПРАВО";
-				else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -332,9 +325,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "ЛЕВО";
-				else if (_check_10(_status.data)) str = "ПРАВО";
-				else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -363,9 +356,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "ЛЕВО";
-				else if (_check_10(_status.data)) str = "ПРАВО";
-				else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -409,8 +402,8 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "СТОП";
-				else if (_check_10(_status.data)) str = "ИДТИ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -439,9 +432,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "СТОП";
-				else if (_check_10(_status.data)) str = "ИДТИ";
-				else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -470,9 +463,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "СТОП";
-				else if (_check_10(_status.data)) str = "ИДТИ";
-				else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -501,9 +494,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data)) 
             {
-				if (_check_01(_status.data)) str = "СТОП";
-				else if (_check_10(_status.data)) str = "ИДТИ";
-				else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -525,7 +518,7 @@ unsigned int lht_test_on_off()
  */
 unsigned int btn_test_status()
 {
-	int res = openPort("/dev/ttyUSB0", B9600);
+    int res = openPort("/dev/ttyUSB0", B9600);
     if(!res)
     {
         printf("Невозможно открыть COM порт\n");
@@ -538,17 +531,33 @@ unsigned int btn_test_status()
     {
         printf("* Тестируется кнопка ............... #%u\n", btns[i]);
         {
-			printf("\t- Проверка статуса\n");
-			_status.addr = btns[i];
-			print_pkg(&_status, _status.str);
-			push_pkg(&_status);
+	    printf("\t- Проверка статуса\n");
+	    _status.addr = btns[i];
+	    print_pkg(&_status, _status.str);
+	    push_pkg(&_status);
 
-			char * str = "ВЫКЛ";
-			if ((_status.data & (1 << 4)) != 0) 
-			{
-				str = "ТРЕВОГА";
-			}
-			print_pkg(&_status, str);
+	    char * str = "ВЫКЛ";
+	    if ((_status.data & (1 << 4)) != 0) 
+	    {
+		str = "ТРЕВОГА";
+	    }
+	    print_pkg(&_status, str);
+
+            _delay_ms(INTERVAL);
+        }
+	
+	{
+            printf("\t- Отключение\n");
+            _off.addr = btns[i];
+            print_pkg(&_off, _off.str);
+            push_pkg(&_off);
+
+            char * str = "УСПЕШНО";
+	    if ((_status.data & (1 << 4)) != 0) 
+	    {
+		str = "ПРОВАЛ";
+	    }
+	    print_pkg(&_status, str);
 
             _delay_ms(INTERVAL);
         }
@@ -573,22 +582,22 @@ unsigned int push_pkg(PKG *aPkg)
     sendData(&aPkg->cmd,  1);
     sendData(&aPkg->data, 1);
 
-	if (aPkg->addr < 128)
+    if (aPkg->addr < BROADCAST_ADDR)
+    {
+	unsigned char rbuff[3];
+	for (unsigned int i = 0; i < 3; i++)
 	{
-		unsigned char rbuff[3];
-		for (unsigned int i = 0; i < 3; i++)
-		{
-			ssize_t s = readData(&rbuff[i], 1);
-			if (s < 1)
-			{
-				printf("Нет ответа\n");
-				return 0;
-			}
-		}
-    
-		aPkg->addr = rbuff[0];
-		aPkg->cmd  = rbuff[1];
-		aPkg->data = rbuff[2];
+	    ssize_t s = readData(&rbuff[i], 1);
+	    if (s < 1)
+	    {
+		printf("Нет ответа\n");
+		return 0;
+	    }
+	}
+
+	aPkg->addr = rbuff[0];
+	aPkg->cmd  = rbuff[1];
+	aPkg->data = rbuff[2];
     }
     
     return 1;
@@ -650,10 +659,10 @@ unsigned int userCmds()
             ssize_t s = readData(&rbuff[i], 1);
             if (s < 1)
             {
-				printf("Нет ответа\n");
-				//return 0;
-				i = 10;
-				break;
+		printf("Нет ответа\n");
+		//return 0;
+		i = 10;
+		break;
             }
             i++;
         }
