@@ -26,10 +26,9 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "EsCOMTools.h"     ///< Инструменты работы с COM портом Linux
 #include "EsPrintBits.h"    ///< Инструмент побитового вывода значения
 #include "EsDelay.h"        ///< Интсрумент приостановки выполнения программы
-#include <time.h>           ///< Для nanosleep
 
 #define STATUS      ( 0x00 ) ///< Команда запроса статуса устройства
-#define SET     ( 0x01 ) ///< Команда установки состояния устройства
+#define SET         ( 0x01 ) ///< Команда установки состояния устройства
 
 #define IDLE        ( 0x00 ) ///< Заглуша, используется совместно с командой STATUS
 #define CMD_OFF     ( 0x00 ) ///< Сброс состояния устройства
@@ -272,8 +271,8 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "ЛЕВО";
-        else if (_check_10(_status.data)) str = "ПРАВО";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -302,9 +301,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "ЛЕВО";
-        else if (_check_10(_status.data)) str = "ПРАВО";
-        else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -333,9 +332,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "ЛЕВО";
-        else if (_check_10(_status.data)) str = "ПРАВО";
-        else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -364,9 +363,9 @@ unsigned int arw_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "ЛЕВО";
-        else if (_check_10(_status.data)) str = "ПРАВО";
-        else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "ЛЕВО";
+		else if (_check_10(_status.data)) str = "ПРАВО";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -410,8 +409,8 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "СТОП";
-        else if (_check_10(_status.data)) str = "ИДТИ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -440,9 +439,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "СТОП";
-        else if (_check_10(_status.data)) str = "ИДТИ";
-        else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -471,9 +470,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "СТОП";
-        else if (_check_10(_status.data)) str = "ИДТИ";
-        else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -502,9 +501,9 @@ unsigned int lht_test_on_off()
             char * str = "УСПЕШНО";
             if (!_check_00(_status.data))
             {
-        if (_check_01(_status.data)) str = "СТОП";
-        else if (_check_10(_status.data)) str = "ИДТИ";
-        else str = "ПРОВАЛ";
+		if (_check_01(_status.data)) str = "СТОП";
+		else if (_check_10(_status.data)) str = "ИДТИ";
+		else str = "ПРОВАЛ";
             } else str = "ВЫКЛ";
             print_pkg(&_status, str);
 
@@ -539,31 +538,31 @@ unsigned int btn_test_status()
     {
         printf("* Тестируется кнопка ............... #%u\n", btns[i]);
         {
-        printf("\t- Проверка статуса\n");
-        _status.addr = btns[i];
-        print_pkg(&_status, _status.str);
-        push_pkg(&_status);
+	    printf("\t- Проверка статуса\n");
+	    _status.addr = btns[i];
+	    print_pkg(&_status, _status.str);
+	    push_pkg(&_status);
 
-        char * str = "ВЫКЛ";
-        if ((_status.data & (1 << 4)) != 0)
-        {
-        str = "ТРЕВОГА";
-        }
-        print_pkg(&_status, str);
+	    char * str = "ВЫКЛ";
+	    if ((_status.data & (1 << 4)) != 0)
+	    {
+		str = "ТРЕВОГА";
+	    }
+	    print_pkg(&_status, str);
 
             _delay_ms(INTERVAL);
         }
 
-    {
-            printf("\t- Отключение\n");
-            _off.addr = btns[i];
-            print_pkg(&_off, _off.str);
-            push_pkg(&_off);
+	{
+	printf("\t- Отключение\n");
+	_off.addr = btns[i];
+	print_pkg(&_off, _off.str);
+	push_pkg(&_off);
 
-            char * str = "УСПЕШНО";
+	char * str = "УСПЕШНО";
         if ((_status.data & (1 << 4)) != 0)
         {
-        str = "ПРОВАЛ";
+	    str = "ПРОВАЛ";
         }
         print_pkg(&_status, str);
 
@@ -667,20 +666,20 @@ unsigned int userCmds()
             ssize_t s = readData(&rbuff[i], 1);
             if (s < 1)
             {
-        printf("Нет ответа\n");
-        //return 0;
-        i = 10;
-        break;
-            }
-            i++;
-        }
+		printf("Нет ответа\n");
+		//return 0;
+		i = 10;
+		break;
+	    }
+	    i++;
+	}
 
-        if (i != 10)
-        {
-            SHOW(unsigned char, rbuff[0]); SHOW(unsigned char, rbuff[1]); SHOW(unsigned char, rbuff[2]);
-            printf("\n");
-        }
-        _delay_ms(interval);
+	if (i != 10)
+	{
+	    SHOW(unsigned char, rbuff[0]); SHOW(unsigned char, rbuff[1]); SHOW(unsigned char, rbuff[2]);
+	    printf("\n");
+	}
+	_delay_ms(interval);
     }
 
     closeCom();
