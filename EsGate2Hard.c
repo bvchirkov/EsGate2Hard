@@ -28,7 +28,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "EsDelay.h"        ///< Интсрумент приостановки выполнения программы
 
 #define STATUS		( 0x00 ) ///< Команда запроса статуса устройства
-#define SET		( 0x01 ) ///< Команда установки состояния устройства
+#define SET			( 0x01 ) ///< Команда установки состояния устройства
 
 #define IDLE		( 0x00 ) ///< Заглуша, используется совместно с командой STATUS
 #define CMD_OFF		( 0x00 ) ///< Сброс состояния устройства
@@ -39,7 +39,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define CMD_STOP	( 0x01 ) ///< Включение светофора в режиме запрета движения через проем
 #define CMD_GO		( 0x02 ) ///< Включение светофора в режиме разрешения движения через проем
 
-#define INTERVAL	( 1000 ) ///< Интервал, мс
+#define INTERVAL	( 3000 ) ///< Интервал, мс
 
 #define NUM_OF_ARW 	( 2 )   ///< Количество устройств типа СТРЕЛКА
 #define NUM_OF_LHT 	( 3 )   ///< Количество устройств типа СВЕТОФОР
@@ -71,9 +71,12 @@ struct Btn
 };
 
 void read_btn_status(struct Btn*);
+void _sleep_s(unsigned int);
+
 unsigned int push_pkg(PKG *);
 unsigned int arw_test_on_off(void);
 unsigned int lht_test_on_off(void);
+unsigned int btn_test_status(void);
 unsigned int work_loop(void);
 unsigned int userCmds(void);
 
@@ -81,19 +84,39 @@ unsigned char _check_00(unsigned char);
 unsigned char _check_01(unsigned char);
 unsigned char _check_10(unsigned char);
 
+PKG _status    = {addr: 0, cmd: STATUS, data: IDLE, str: "STATUS"};
+PKG _arw_left  = {addr: 0, cmd: SET,    data: CMD_LEFT, str: "CMD_LEFT"};
+PKG _arw_right = {addr: 0, cmd: SET,    data: CMD_RIGHT, str: "CMD_RIGHT"};
+PKG _lht_go    = {addr: 0, cmd: SET,    data: CMD_GO, str: "CMD_GO"};
+PKG _lht_stop  = {addr: 0, cmd: SET,    data: CMD_STOP, str: "CMD_STOP"};
+PKG _off       = {addr: 0, cmd: SET,    data: CMD_OFF, str: "CMD_OFF"};
+
 int main(/*int argc, char** argv*/)
 {
     // ======= MANUAL TEST ======
-    //userCmds();
+    //~ userCmds();
     
     // ======= AUTOTESTS ========
-    //arw_test_on_off();
-    //lht_test_on_off();
-
+    while (1)
+    {
+		lht_test_on_off();
+		arw_test_on_off();
+		btn_test_status();
+		_sleep_s(5);
+	}
+    
     // ======= WORK EVERYDAY ========
-    work_loop();
+    //~ work_loop();
    
     return 0;
+}
+
+void _sleep_s(unsigned int aSeconds)
+{
+	for (size_t i = 0; i < aSeconds; i++)
+	{
+		_delay_ms(1000);
+	}
 }
 
 /**
@@ -110,16 +133,11 @@ unsigned int work_loop(void)
     
     printf("--------Старт системы------------------\n");
     unsigned char mainloop = 1;
-    struct Btn btn_s[3] = {
+    struct Btn btn_s[NUM_OF_BTN] = {
 			    {addr:btns[0], state:0, room:0}, 
 			    {addr:btns[1], state:0, room:1},
-			    {addr:btns[2], state:0, room:2}
+			    //~ {addr:btns[2], state:0, room:2}
 			  };
-    PKG _arw_left  = {addr: 0, cmd: SET, data: CMD_LEFT, str: "CMD_LEFT"};
-    PKG _arw_right = {addr: 0, cmd: SET, data: CMD_RIGHT, str: "CMD_RIGHT"};
-    PKG _lht_go    = {addr: 0, cmd: SET, data: CMD_GO, str: "CMD_GO"};
-    PKG _lht_stop  = {addr: 0, cmd: SET, data: CMD_STOP, str: "CMD_STOP"};
-    PKG _off       = {addr: 0, cmd: SET, data: CMD_OFF, str: "CMD_OFF"};
 
     while(mainloop)
     {
@@ -173,9 +191,9 @@ unsigned int work_loop(void)
                 _lht_stop.addr = lhts[2]; push_pkg(&_lht_stop);
                 btn_s[2].state = 0;
             }
-            _delay_ms(30000);
+            _sleep_s(20);
 
-            _off.addr = 128; push_pkg(&_off);
+            _off.addr = BROADCAST_ADDR; push_pkg(&_off);
             flag_on_fire = 0;
         }
 
@@ -239,11 +257,6 @@ unsigned int arw_test_on_off()
     }
     
     printf("--------Тестирование стрелок----Start------------------\n");
-    
-    PKG _status    = {addr: 0, cmd: STATUS, data: IDLE, str: "STATUS"};
-    PKG _arw_left  = {addr: 0, cmd: SET, data: CMD_LEFT, str: "CMD_LEFT"};
-    PKG _arw_right = {addr: 0, cmd: SET, data: CMD_RIGHT, str: "CMD_RIGHT"};
-    PKG _arw_off   = {addr: 0, cmd: SET, data: CMD_OFF, str: "CMD_OFF"};
     
     for (size_t i = 0; i < NUM_OF_ARW; i++)
     {
@@ -330,13 +343,13 @@ unsigned int arw_test_on_off()
 
         {
             printf("\t- Отключение\n");
-            _arw_off.addr = arws[i];
-            print_pkg(&_arw_off, _arw_off.str);
-            push_pkg(&_arw_off);
+            _off.addr = arws[i];
+            print_pkg(&_off, _off.str);
+            push_pkg(&_off);
 
             char * str = "УСПЕШНО";
-            if (!_check_00(_arw_off.data)) str = "ПРОВАЛ";
-            print_pkg(&_arw_off, str);
+            if (!_check_00(_off.data)) str = "ПРОВАЛ";
+            print_pkg(&_off, str);
 
             _delay_ms(INTERVAL);
         }
@@ -358,8 +371,13 @@ unsigned int arw_test_on_off()
 
             _delay_ms(INTERVAL);
         }
+        
+        _status.addr = 0;
+        _arw_left.addr = 0;
+        _arw_right.addr = 0;
+        _off.addr = 0;
     }
-    printf("--------Тестирование стрелок----Stop-------------------\n");
+    printf("--------Тестирование стрелок----Stop-------------------\n\n");
     closeCom();
     return 1;
 }
@@ -378,14 +396,9 @@ unsigned int lht_test_on_off()
     
     printf("--------Тестирование светофоров----Start---------------\n");
     
-    PKG _status   = {addr: 0, cmd: STATUS, data: IDLE, str: "STATUS"};
-    PKG _lht_go   = {addr: 0, cmd: SET, data: CMD_GO, str: "CMD_GO"};
-    PKG _lht_stop = {addr: 0, cmd: SET, data: CMD_STOP, str: "CMD_STOP"};
-    PKG _lht_off  = {addr: 0, cmd: SET, data: CMD_OFF, str: "CMD_OFF"};
-    
     for (size_t i = 0; i < NUM_OF_LHT; i++)
     {
-        printf("* Тестируется световой указатель ............... #%u\n", arws[i]);
+        printf("* Тестируется светофор ............... #%u\n", lhts[i]);
 
         {
             printf("\t- Проверка статуса\n");
@@ -468,13 +481,13 @@ unsigned int lht_test_on_off()
 
         {
             printf("\t- Отключение\n");
-            _lht_off.addr = lhts[i];
-            print_pkg(&_lht_off, _lht_off.str);
-            push_pkg(&_lht_off);
+            _off.addr = lhts[i];
+            print_pkg(&_off, _off.str);
+            push_pkg(&_off);
 
             char * str = "УСПЕШНО";
-            if (!_check_00(_lht_off.data)) str = "ПРОВАЛ";
-            print_pkg(&_lht_off, str);
+            if (!_check_00(_off.data)) str = "ПРОВАЛ";
+            print_pkg(&_off, str);
 
             _delay_ms(INTERVAL);
         }
@@ -496,8 +509,53 @@ unsigned int lht_test_on_off()
 
             _delay_ms(INTERVAL);
         }
+        
+        _status.addr = 0;
+        _lht_go.addr = 0;   
+        _lht_stop.addr = 0;
+        _off.addr = 0;
     }
-    printf("--------Тестирование светофоров----Stop----------------\n");
+    printf("--------Тестирование светофоров----Stop----------------\n\n");
+    closeCom();
+    return 1;
+}
+
+/**
+ * @brief btn_test_status режим тестирования кнопок
+ */
+unsigned int btn_test_status()
+{
+	int res = openPort("/dev/ttyUSB0", B9600);
+    if(!res)
+    {
+        printf("Невозможно открыть COM порт\n");
+        return 0;
+    }
+    
+    printf("--------Тестирование кнопок----Start---------------\n");
+    
+    for (size_t i = 0; i < NUM_OF_LHT; i++)
+    {
+        printf("* Тестируется кнопка ............... #%u\n", btns[i]);
+        {
+			printf("\t- Проверка статуса\n");
+			_status.addr = btns[i];
+			print_pkg(&_status, _status.str);
+			push_pkg(&_status);
+
+			char * str = "ВЫКЛ";
+			if ((_status.data & (1 << 4)) != 0) 
+			{
+				str = "ТРЕВОГА";
+			}
+			print_pkg(&_status, str);
+
+            _delay_ms(INTERVAL);
+        }
+        
+        _status.addr = 0;
+    }
+    printf("--------Тестирование кнопок----Stop----------------\n\n");
     closeCom();
     return 1;
 }
@@ -515,20 +573,23 @@ unsigned int push_pkg(PKG *aPkg)
     sendData(&aPkg->cmd,  1);
     sendData(&aPkg->data, 1);
 
-    unsigned char rbuff[3];
-    for (unsigned int i = 0; i < 3; i++)
-    {
-        ssize_t s = readData(&rbuff[i], 1);
-        if (s < 1)
-        {
-            printf("Нет ответа\n");
-            return 0;
-        }
-    }
+	if (aPkg->addr < 128)
+	{
+		unsigned char rbuff[3];
+		for (unsigned int i = 0; i < 3; i++)
+		{
+			ssize_t s = readData(&rbuff[i], 1);
+			if (s < 1)
+			{
+				printf("Нет ответа\n");
+				return 0;
+			}
+		}
     
-    aPkg->addr = rbuff[0];
-    aPkg->cmd  = rbuff[1];
-    aPkg->data = rbuff[2];
+		aPkg->addr = rbuff[0];
+		aPkg->cmd  = rbuff[1];
+		aPkg->data = rbuff[2];
+    }
     
     return 1;
 }

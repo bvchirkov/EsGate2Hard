@@ -69,9 +69,9 @@ int openPort(const char *COM_name, speed_t speed)
     F_ID = open(COM_name, O_RDWR | O_NOCTTY);
     if(F_ID == -1)
     {
-	char *errmsg = strerror(errno);
-	printf("%s\n", errmsg);
-	return 0;
+		char *errmsg = strerror(errno);
+		printf("%s\n", errmsg);
+		return 0;
     }
 
     struct termios options;     /*структура для установки порта*/
@@ -101,8 +101,8 @@ ssize_t readData(unsigned char *buff, unsigned int size)
     ssize_t n = read(F_ID, buff, size);
     if(n == -1)
     {
-	char *errmsg = strerror(errno);
-	printf("%s\n", errmsg);
+		char *errmsg = strerror(errno);
+		printf("%s\n", errmsg);
     }
     return n;
 }
@@ -112,8 +112,8 @@ ssize_t sendData(const unsigned char* buff, unsigned int len)
     ssize_t n = write(F_ID, buff, len);
     if(n == -1)
     {
-	char *errmsg = strerror(errno);
-	printf("%s\n", errmsg);
+		char *errmsg = strerror(errno);
+		printf("%s\n", errmsg);
     }
     return n;
 }

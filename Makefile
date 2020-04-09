@@ -21,8 +21,8 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ########################################################################
 
-CC=gcc
-CFLAGS= -c -Wall
+CC=gcc-8
+CFLAGS= -c -Wall -std=c11
 
 .PHONY: all clean
 all: clean EsGate2Hard
